@@ -31,3 +31,15 @@ def fetch_weather_data():
             )
         else:
             print(f"Error fetching weather data for {city}: {response.status_code} - {response.text}")
+from django.db.models import Avg, Max, Min, Count
+
+
+def calculate_daily_aggregates():
+    today = datetime.today().date()
+    summary = WeatherData.objects.filter(fetched_at__date=today).aggregate(
+        avg_temp=Avg('temperature'),
+        max_temp=Max('temperature'),
+        min_temp=Min('temperature'),
+        dominant_weather=WeatherData.objects.values('main').annotate(count=Count('main')).order_by('-count').first()['main']
+    )
+    return summary
