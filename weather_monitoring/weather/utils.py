@@ -1,8 +1,12 @@
+# weather/utils.py
+
 import requests
 from datetime import datetime
-from .models import WeatherData
+from django.utils import timezone
+from .models import WeatherData # Ensure your WeatherData model is imported
+from django.conf import settings
 
-API_KEY = '9bd1f33be3923e9ef3e78fc5068ed68f'
+API_KEY = settings.API_KEY
 METRO_CITIES = ['Delhi', 'Mumbai', 'Chennai', 'Bangalore', 'Kolkata', 'Hyderabad']
 
 def fetch_weather_data():
@@ -15,6 +19,7 @@ def fetch_weather_data():
             feels_like = data['main']['feels_like'] - 273.15
             main = data['weather'][0]['main']
             dt = datetime.fromtimestamp(data['dt'])
+            dt = timezone.make_aware(dt)  # Make datetime timezone-aware
 
             # Store data in the database
             WeatherData.objects.create(
@@ -22,7 +27,7 @@ def fetch_weather_data():
                 main=main,
                 temperature=temperature,
                 feels_like=feels_like,
-                dt=dt
+                dt=dt  # Use the timezone-aware datetime
             )
         else:
             print(f"Error fetching weather data for {city}: {response.status_code} - {response.text}")

@@ -20,7 +20,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-@mqw^n&jng86p7)*(5ld7y^e5of0k7v6wb#yw49*gd$%wzi$sq"
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch the API key and Django secret key from the environment
+API_KEY = os.getenv('OPENWEATHER_API_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+if API_KEY is None:
+    raise ValueError("API key not found. Please set the OPENWEATHER_API_KEY environment variable.")
+
+if SECRET_KEY is None:
+    raise ValueError("Django secret key not found. Please set the DJANGO_SECRET_KEY environment variable.")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -132,6 +147,6 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'fetch-weather-every-5-minutes': {
         'task': 'weather.tasks.periodic_weather_update',
-        'schedule': crontab(minute='*/5'),
+        'schedule': crontab(minute='*/1'),
     },
 }
