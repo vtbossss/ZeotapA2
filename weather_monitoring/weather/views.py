@@ -4,7 +4,10 @@ from .models import WeatherData
 from .utils import calculate_daily_aggregates
 from django.db.models import OuterRef, Subquery
 from django.db.models import Max
+from .utils import calculate_daily_aggregates, check_for_alerts
 
+
+    
 def home(request):
     # Get the latest weather data for each city
     latest_dates = WeatherData.objects.values('city').annotate(latest_fetched_at=Max('fetched_at'))
@@ -17,9 +20,22 @@ def home(request):
     
     daily_summary = calculate_daily_aggregates()
     
+    # Get the first city's weather data for alert (you can customize this for all cities)
+    alerts = []
+    for city_weather in latest_data:
+        temperature = city_weather.temperature
+        weather_condition = city_weather.main
+        
+        # Check if any alerts are triggered for each city
+        city_alerts = check_for_alerts(temperature, weather_condition)
+        if city_alerts:
+            alerts.extend(city_alerts)
+
+
     return render(request, 'home.html', {
         'latest_data': latest_data,
         'daily_summary': daily_summary,
+        'alerts': alerts,  # Pass the alerts to the template
     })
 
 

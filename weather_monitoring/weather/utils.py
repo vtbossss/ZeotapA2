@@ -53,3 +53,21 @@ def calculate_daily_aggregates():
     
     summary['dominant_weather'] = dominant_weather['main'] if dominant_weather else None
     return summary
+
+# Hard-coded threshold values
+TEMP_THRESHOLD = 35  # degrees Celsius
+CONDITION_THRESHOLD = ['Rain', 'Thunderstorm']  # Weather conditions that trigger alerts
+
+def check_for_alerts(current_temp, weather_condition):
+    """Check if the temperature or weather condition exceeds defined thresholds."""
+    alerts = []
+    
+    # Check for temperature breach
+    if current_temp > TEMP_THRESHOLD:
+        alerts.append(f"Alert: Temperature has exceeded {TEMP_THRESHOLD}°C!")
+    
+    # Check for weather condition breach
+    if weather_condition in CONDITION_THRESHOLD:
+        alerts.append(f"Alert: Weather condition '{weather_condition}' has triggered an alert!")
+    
+    return alerts
