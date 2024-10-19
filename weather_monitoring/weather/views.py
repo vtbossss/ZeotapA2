@@ -1,13 +1,8 @@
-# weather/views.py
 from django.shortcuts import render
 from .models import WeatherData
-from .utils import calculate_daily_aggregates
-from django.db.models import OuterRef, Subquery
-from django.db.models import Max
 from .utils import calculate_daily_aggregates, check_for_alerts
+from django.db.models import Max
 
-
-    
 def home(request):
     # Get the latest weather data for each city
     latest_dates = WeatherData.objects.values('city').annotate(latest_fetched_at=Max('fetched_at'))
@@ -20,17 +15,19 @@ def home(request):
     
     daily_summary = calculate_daily_aggregates()
     
-    # Get the first city's weather data for alert (you can customize this for all cities)
+    # Initialize alerts list
     alerts = []
+
+    # Check alerts for each city's weather data
     for city_weather in latest_data:
         temperature = city_weather.temperature
         weather_condition = city_weather.main
-        
+        city_name = city_weather.city  # Get the city name
+
         # Check if any alerts are triggered for each city
-        city_alerts = check_for_alerts(temperature, weather_condition)
+        city_alerts = check_for_alerts(temperature, weather_condition, city_name)  # Pass city name
         if city_alerts:
             alerts.extend(city_alerts)
-
 
     return render(request, 'home.html', {
         'latest_data': latest_data,
@@ -39,13 +36,7 @@ def home(request):
     })
 
 
-# weather/views.py
-from .visualizations import plot_daily_summary
-import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
-
+# Keep the visualizations function unchanged if no modifications are required there
 def visualizations(request):
     plot_html = plot_daily_summary()  # Get the plot HTML
     return render(request, 'visualizations.html', {'plot_html': plot_html})
-

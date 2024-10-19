@@ -1,27 +1,36 @@
-<!-- templates/home.html -->
 {% extends 'base.html' %}
 
 {% block content %}
 <h2>Latest Weather Data</h2>
 
-{% if latest_data %}
-    {% for data in latest_data %}
-        <div>
-            <h4>City: {{ data.city }}</h4>
-            <p>Main Condition: {{ data.main }}</p>
-            <p>Temperature: {{ data.temperature }} °C</p>
-            <p>Feels Like: {{ data.feels_like }} °C</p>
-            <p>Data Fetched At: {{ data.fetched_at }}</p>
-        </div>
-    {% endfor %}
-{% else %}
-    <p>No weather data available.</p>
-{% endif %}
+<!-- Dropdown for Temperature Unit Selection -->
+<label for="temp-unit">Choose Temperature Unit:</label>
+<select id="temp-unit" onchange="updateTemperature()">
+    <option value="C">Celsius (°C)</option>
+    <option value="F">Fahrenheit (°F)</option>
+</select>
+
+<div id="weather-data">
+    {% if latest_data %}
+        {% for data in latest_data %}
+            <div class="city-weather" data-temp-c="{{ data.temperature }}" data-feels-like-c="{{ data.feels_like }}">
+                <h4>City: {{ data.city }}</h4>
+                <p>Main Condition: {{ data.main }}</p>
+                <p>Temperature: <span class="temp-value">{{ data.temperature }}</span> °C</p>
+                <p>Feels Like: <span class="feels-like-value">{{ data.feels_like }}</span> °C</p>
+                <p>Data Fetched At: {{ data.fetched_at }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No weather data available.</p>
+    {% endif %}
+</div>
 
 <h3>Daily Summary</h3>
-<p>Average Temperature: {{ daily_summary.avg_temp }}</p>
-<p>Max Temperature: {{ daily_summary.max_temp }}</p>
-<p>Min Temperature: {{ daily_summary.min_temp }}</p>
+<!-- Add data attributes for Celsius values -->
+<p>Average Temperature: <span id="avg-temp" data-avg-c="{{ daily_summary.avg_temp }}">{{ daily_summary.avg_temp }} °C</span></p>
+<p>Max Temperature: <span id="max-temp" data-max-c="{{ daily_summary.max_temp }}">{{ daily_summary.max_temp }} °C</span></p>
+<p>Min Temperature: <span id="min-temp" data-min-c="{{ daily_summary.min_temp }}">{{ daily_summary.min_temp }} °C</span></p>
 <p>Dominant Weather: {{ daily_summary.dominant_weather }}</p>
 
 <!-- Alerts Section -->
@@ -35,5 +44,54 @@
 {% else %}
     <p>No alerts triggered.</p>
 {% endif %}
+
+<script>
+function updateTemperature() {
+    const tempUnit = document.getElementById("temp-unit").value;
+    const cityWeathers = document.querySelectorAll(".city-weather");
+
+    cityWeathers.forEach(weather => {
+        const tempC = parseFloat(weather.getAttribute("data-temp-c"));
+        const feelsLikeC = parseFloat(weather.getAttribute("data-feels-like-c"));
+        
+        if (tempUnit === "F") {
+            // Convert to Fahrenheit
+            const tempF = (tempC * 9/5) + 32;
+            const feelsLikeF = (feelsLikeC * 9/5) + 32;
+            weather.querySelector(".temp-value").textContent = tempF.toFixed(2);
+            weather.querySelector(".feels-like-value").textContent = feelsLikeF.toFixed(2);
+            weather.querySelector(".temp-value").innerHTML += " °F";
+            weather.querySelector(".feels-like-value").innerHTML += " °F";
+        } else {
+            // Stay in Celsius
+            weather.querySelector(".temp-value").textContent = tempC;
+            weather.querySelector(".feels-like-value").textContent = feelsLikeC;
+            weather.querySelector(".temp-value").innerHTML += " °C";
+            weather.querySelector(".feels-like-value").innerHTML += " °C";
+        }
+    });
+
+    // Update daily summary temperatures
+    const avgTempC = parseFloat(document.getElementById("avg-temp").getAttribute("data-avg-c"));
+    const maxTempC = parseFloat(document.getElementById("max-temp").getAttribute("data-max-c"));
+    const minTempC = parseFloat(document.getElementById("min-temp").getAttribute("data-min-c"));
+
+    if (tempUnit === "F") {
+        // Convert daily summary to Fahrenheit
+        const avgTempF = (avgTempC * 9/5) + 32;
+        const maxTempF = (maxTempC * 9/5) + 32;
+        const minTempF = (minTempC * 9/5) + 32;
+
+        document.getElementById("avg-temp").textContent = avgTempF.toFixed(2) + " °F";
+        document.getElementById("max-temp").textContent = maxTempF.toFixed(2) + " °F";
+        document.getElementById("min-temp").textContent = minTempF.toFixed(2) + " °F";
+    } else {
+        // Stay in Celsius
+        document.getElementById("avg-temp").textContent = avgTempC + " °C";
+        document.getElementById("max-temp").textContent = maxTempC + " °C";
+        document.getElementById("min-temp").textContent = minTempC + " °C";
+    }
+}
+</script>
 
 {% endblock %}
