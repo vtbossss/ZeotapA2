@@ -1,0 +1,26 @@
+<!-- templates/home.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Latest Weather Data</h2>
+
+{% if latest_data %}
+    {% for data in latest_data %}
+        <div>
+            <h4>City: {{ data.city }}</h4>
+            <p>Main Condition: {{ data.main }}</p>
+            <p>Temperature: {{ data.temperature }} °C</p>
+            <p>Feels Like: {{ data.feels_like }} °C</p>
+            <p>Data Fetched At: {{ data.fetched_at }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No weather data available.</p>
+{% endif %}
+
+<h3>Daily Summary</h3>
+<p>Average Temperature: {{ daily_summary.avg_temp }}</p>
+<p>Max Temperature: {{ daily_summary.max_temp }}</p>
+<p>Min Temperature: {{ daily_summary.min_temp }}</p>
+<p>Dominant Weather: {{ daily_summary.dominant_weather }}</p>
+{% endblock %}

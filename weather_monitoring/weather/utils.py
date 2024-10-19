@@ -36,10 +36,20 @@ from django.db.models import Avg, Max, Min, Count
 
 def calculate_daily_aggregates():
     today = datetime.today().date()
+    
+    # Aggregate temperature data
     summary = WeatherData.objects.filter(fetched_at__date=today).aggregate(
         avg_temp=Avg('temperature'),
         max_temp=Max('temperature'),
         min_temp=Min('temperature'),
-        dominant_weather=WeatherData.objects.values('main').annotate(count=Count('main')).order_by('-count').first()['main']
     )
+    
+    # Get the dominant weather condition separately
+    dominant_weather = WeatherData.objects.filter(fetched_at__date=today)\
+        .values('main')\
+        .annotate(count=Count('main'))\
+        .order_by('-count')\
+        .first()
+    
+    summary['dominant_weather'] = dominant_weather['main'] if dominant_weather else None
     return summary

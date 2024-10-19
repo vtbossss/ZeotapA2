@@ -1,0 +1,9 @@
+<!-- templates/visualisations.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Daily Temperature Trend</h2>
+<div>
+    {{ plot_html|safe }}  <!-- Render the Plotly chart -->
+</div>
+{% endblock %}
