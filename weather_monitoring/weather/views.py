@@ -35,7 +35,7 @@ def home(request):
         'alerts': alerts,  # Pass the alerts to the template
     })
 
-
+from .visualizations import plot_daily_summary
 # Keep the visualizations function unchanged if no modifications are required there
 def visualizations(request):
     plot_html = plot_daily_summary()  # Get the plot HTML

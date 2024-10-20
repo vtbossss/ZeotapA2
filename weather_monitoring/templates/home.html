@@ -16,8 +16,8 @@
             <div class="city-weather" data-temp-c="{{ data.temperature }}" data-feels-like-c="{{ data.feels_like }}">
                 <h4>City: {{ data.city }}</h4>
                 <p>Main Condition: {{ data.main }}</p>
-                <p>Temperature: <span class="temp-value">{{ data.temperature }}</span> °C</p>
-                <p>Feels Like: <span class="feels-like-value">{{ data.feels_like }}</span> °C</p>
+                <p>Temperature: <span class="temp-value">{{ data.temperature|floatformat:2 }}</span> °C</p>
+                <p>Feels Like: <span class="feels-like-value">{{ data.feels_like|floatformat:2 }}</span> °C</p>
                 <p>Data Fetched At: {{ data.fetched_at }}</p>
             </div>
         {% endfor %}
@@ -28,9 +28,9 @@
 
 <h3>Daily Summary</h3>
 <!-- Add data attributes for Celsius values -->
-<p>Average Temperature: <span id="avg-temp" data-avg-c="{{ daily_summary.avg_temp }}">{{ daily_summary.avg_temp }} °C</span></p>
-<p>Max Temperature: <span id="max-temp" data-max-c="{{ daily_summary.max_temp }}">{{ daily_summary.max_temp }} °C</span></p>
-<p>Min Temperature: <span id="min-temp" data-min-c="{{ daily_summary.min_temp }}">{{ daily_summary.min_temp }} °C</span></p>
+<p>Average Temperature: <span id="avg-temp" data-avg-c="{{ daily_summary.avg_temp }}">{{ daily_summary.avg_temp|floatformat:2 }} °C</span></p>
+<p>Max Temperature: <span id="max-temp" data-max-c="{{ daily_summary.max_temp }}">{{ daily_summary.max_temp|floatformat:2 }} °C</span></p>
+<p>Min Temperature: <span id="min-temp" data-min-c="{{ daily_summary.min_temp }}">{{ daily_summary.min_temp|floatformat:2 }} °C</span></p>
 <p>Dominant Weather: {{ daily_summary.dominant_weather }}</p>
 
 <!-- Alerts Section -->
@@ -64,8 +64,8 @@ function updateTemperature() {
             weather.querySelector(".feels-like-value").innerHTML += " °F";
         } else {
             // Stay in Celsius
-            weather.querySelector(".temp-value").textContent = tempC;
-            weather.querySelector(".feels-like-value").textContent = feelsLikeC;
+            weather.querySelector(".temp-value").textContent = tempC.toFixed(2);
+            weather.querySelector(".feels-like-value").textContent = feelsLikeC.toFixed(2);
             weather.querySelector(".temp-value").innerHTML += " °C";
             weather.querySelector(".feels-like-value").innerHTML += " °C";
         }
@@ -87,9 +87,9 @@ function updateTemperature() {
         document.getElementById("min-temp").textContent = minTempF.toFixed(2) + " °F";
     } else {
         // Stay in Celsius
-        document.getElementById("avg-temp").textContent = avgTempC + " °C";
-        document.getElementById("max-temp").textContent = maxTempC + " °C";
-        document.getElementById("min-temp").textContent = minTempC + " °C";
+        document.getElementById("avg-temp").textContent = avgTempC.toFixed(2) + " °C";
+        document.getElementById("max-temp").textContent = maxTempC.toFixed(2) + " °C";
+        document.getElementById("min-temp").textContent = minTempC.toFixed(2) + " °C";
     }
 }
 </script>
