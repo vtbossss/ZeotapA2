@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .models import WeatherData
 from .utils import calculate_daily_aggregates, check_for_alerts
 from django.db.models import Max
+from django.http import StreamingHttpResponse
+import time
 
 def home(request):
     # Get the latest weather data for each city
@@ -35,8 +37,62 @@ def home(request):
         'alerts': alerts,  # Pass the alerts to the template
     })
 
+def event_stream():
+    while True:
+        latest_dates = WeatherData.objects.values('city').annotate(latest_fetched_at=Max('fetched_at'))
+        latest_data = WeatherData.objects.filter(
+            city__in=[item['city'] for item in latest_dates],
+            fetched_at__in=[item['latest_fetched_at'] for item in latest_dates]
+        )
+        
+        # Prepare the data for SSE
+        data = {
+            'latest_data': list(latest_data.values()),
+            'timestamp': time.time()  # Optional timestamp for the client
+        }
+        
+        yield f"data: {data}\n\n"
+        time.sleep(5)  # Adjust the frequency of updates as needed
+
+def sse_weather_data(request):
+    response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+    response['Cache-Control'] = 'no-cache'
+    return response
+
 from .visualizations import plot_daily_summary
-# Keep the visualizations function unchanged if no modifications are required there
 def visualizations(request):
     plot_html = plot_daily_summary()  # Get the plot HTML
     return render(request, 'visualizations.html', {'plot_html': plot_html})
+
+from django.http import StreamingHttpResponse
+import json
+import time
+
+def stream_weather_data(request):
+    def event_stream():
+        while True:
+            # Fetch the latest weather data
+            latest_dates = WeatherData.objects.values('city').annotate(latest_fetched_at=Max('fetched_at'))
+            latest_data = WeatherData.objects.filter(
+                city__in=[item['city'] for item in latest_dates],
+                fetched_at__in=[item['latest_fetched_at'] for item in latest_dates]
+            )
+
+            # Prepare the data as a list of dictionaries
+            data = [
+                {
+                    "city": weather.city,
+                    "temperature": weather.temperature,
+                    "feels_like": weather.feels_like,
+                    "main": weather.main,
+                    "fetched_at": weather.fetched_at.strftime('%Y-%m-%d %H:%M:%S'),
+                }
+                for weather in latest_data
+            ]
+
+            # Send the data as SSE
+            yield f"data: {json.dumps(data)}\n\n"  # Use json.dumps to convert to JSON
+
+            time.sleep(30)  # Wait for 30 seconds before sending the next update
+
+    return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
