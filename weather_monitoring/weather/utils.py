@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 from django.utils import timezone
-from .models import WeatherData  # Ensure your WeatherData model is imported
+from .models import WeatherData,DailyAggregate  # Ensure your WeatherData model is imported
 from django.conf import settings
 from django.db.models import Avg, Max, Min, Count
 
@@ -55,7 +55,19 @@ def calculate_daily_aggregates():
         .first()
     
     summary['dominant_weather'] = dominant_weather['main'] if dominant_weather else None
-    return summary
+    
+    # Store the summary in DailyAggregate model
+    DailyAggregate.objects.update_or_create(
+        date=today,
+        defaults={
+            'avg_temp': summary['avg_temp'],
+            'max_temp': summary['max_temp'],
+            'min_temp': summary['min_temp'],
+            'avg_humidity': summary['avg_humidity'],
+            'max_wind_speed': summary['max_wind_speed'],
+            'dominant_weather': summary['dominant_weather']
+        }
+    )
 
 # Hard-coded threshold values
 TEMP_THRESHOLD = 35  # degrees Celsius

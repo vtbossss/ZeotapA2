@@ -12,3 +12,22 @@ class WeatherData(models.Model):
 
     def __str__(self):
         return f"{self.city} - {self.temperature}°C"
+
+from django.utils import timezone
+
+class DailyAggregate(models.Model):
+    # Field to store the date of the aggregate
+    date = models.DateField(default=timezone.now, unique=True)
+
+    # Fields to store aggregated data
+    avg_temp = models.FloatField()
+    max_temp = models.FloatField()
+    min_temp = models.FloatField()
+    avg_humidity = models.FloatField()
+    max_wind_speed = models.FloatField()
+
+    # Field to store the dominant weather condition
+    dominant_weather = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return f"Daily Aggregate for {self.date}"
