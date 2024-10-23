@@ -1,9 +1,61 @@
-<!-- templates/visualisations.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Daily Temperature Trend</h2>
-<div>
-    {{ plot_html|safe }}  <!-- Render the Plotly chart -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Title with modern font and stylish color -->
+            <h2 class="text-center mb-4" style="font-family: 'Poppins', sans-serif; color: #4A90E2;">
+                Daily Temperature Trend
+            </h2>
+            
+            <!-- Card for Plotly chart with shadow and padding -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <div id="plot-container" class="chart-container">
+                        {{ plot_html|safe }}  <!-- Render the Plotly chart -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Custom styling for the page -->
+<style>
+    .chart-container {
+        max-width: 100%;  /* Make sure the chart is responsive */
+        overflow-x: auto;
+        padding: 20px;
+    }
+
+    /* Styling for the card that holds the chart */
+    .card {
+        border-radius: 12px;
+        border: none;
+    }
+
+    .card-body {
+        padding: 2rem;
+        background: #f8f9fa;  /* Light background color */
+    }
+
+    /* Hover effect for the card */
+    .card:hover {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        transition: all 0.3s ease-in-out;
+    }
+    
+    /* Soft gradient background for the entire page */
+    body {
+        background: linear-gradient(135deg, #f0f4f7, #e2ebf0);
+    }
+</style>
+
+<!-- Add responsiveness to Plotly charts -->
+<script>
+    // Ensure the Plotly chart is responsive
+    var config = {responsive: true};
+    Plotly.newPlot('plot-container', data, layout, config);
+</script>
 {% endblock %}

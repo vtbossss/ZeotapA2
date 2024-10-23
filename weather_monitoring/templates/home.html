@@ -1,52 +1,86 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Latest Weather Data</h2>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Latest Weather Data</h2>
 
-<!-- Dropdown for Temperature Unit Selection -->
-<label for="temp-unit">Choose Temperature Unit:</label>
-<select id="temp-unit" onchange="updateTemperature()">
-    <option value="C">Celsius (°C)</option>
-    <option value="F">Fahrenheit (°F)</option>
-</select>
+    <!-- Dropdown for Temperature Unit Selection -->
+    <div class="d-flex justify-content-end mb-3">
+        <label for="temp-unit" class="me-2">Choose Temperature Unit:</label>
+        <select id="temp-unit" class="form-select w-auto" onchange="updateTemperature()">
+            <option value="C">Celsius (°C)</option>
+            <option value="F">Fahrenheit (°F)</option>
+        </select>
+    </div>
 
-<!-- Display weather data -->
-<div id="weather-data">
-    {% if latest_data %}
-        {% for data in latest_data %}
-            <div class="city-weather" data-temp-c="{{ data.temperature }}" data-feels-like-c="{{ data.feels_like }}" data-humidity="{{ data.humidity }}" data-wind-speed="{{ data.wind_speed }}">
-                <h4>City: {{ data.city }}</h4>
-                <p>Main Condition: {{ data.main }}</p>
-                <p>Temperature: <span class="temp-value">{{ data.temperature|floatformat:2 }}</span></p>
-                <p>Feels Like: <span class="feels-like-value">{{ data.feels_like|floatformat:2 }}</span></p>
-                <p>Humidity: <span class="humidity-value">{{ data.humidity }}%</span></p>
-                <p>Wind Speed: <span class="wind-speed-value">{{ data.wind_speed }} m/s</span></p>
-                <p>Data Fetched At: {{ data.fetched_at }}</p>
+    <!-- Display weather data -->
+    <div id="weather-data" class="row">
+        {% if latest_data %}
+            {% for data in latest_data %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">City: {{ data.city }}</h5>
+                            <p><strong>Main Condition:</strong> {{ data.main }}</p>
+                            <p><strong>Temperature:</strong> 
+                                <span class="temp-value" data-temp-c="{{ data.temperature|floatformat:2 }}">
+                                    {{ data.temperature|floatformat:2 }} °C
+                                </span>
+                            </p>
+                            <p><strong>Feels Like:</strong> 
+                                <span class="feels-like-value" data-feels-like-c="{{ data.feels_like|floatformat:2 }}">
+                                    {{ data.feels_like|floatformat:2 }} °C
+                                </span>
+                            </p>
+                            <p><strong>Humidity:</strong> <span class="humidity-value">{{ data.humidity }}%</span></p>
+                            <p><strong>Wind Speed:</strong> <span class="wind-speed-value">{{ data.wind_speed }} m/s</span></p>
+                            <p class="text-muted"><strong>Data Fetched At:</strong> {{ data.fetched_at }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                No weather data available.
             </div>
-        {% endfor %}
-    {% else %}
-        <p>No weather data available.</p>
-    {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Display daily summary -->
+    <h3 class="text-center mt-5">Daily Summary</h3>
+    <div class="card my-4 shadow-sm">
+        <div class="card-body">
+            <p><strong>Average Temperature:</strong> 
+                <span id="avg-temp" class="summary-temp" data-avg-c="{{ daily_summary.avg_temp }}">{{ daily_summary.avg_temp|floatformat:2 }} °C</span>
+            </p>
+            <p><strong>Max Temperature:</strong> 
+                <span id="max-temp" class="summary-temp" data-max-c="{{ daily_summary.max_temp }}">{{ daily_summary.max_temp|floatformat:2 }} °C</span>
+            </p>
+            <p><strong>Min Temperature:</strong> 
+                <span id="min-temp" class="summary-temp" data-min-c="{{ daily_summary.min_temp }}">{{ daily_summary.min_temp|floatformat:2 }} °C</span>
+            </p>
+            <p><strong>Average Humidity:</strong> {{ daily_summary.avg_humidity|floatformat:2 }}%</p>
+            <p><strong>Max Wind Speed:</strong> {{ daily_summary.max_wind_speed|floatformat:2 }} m/s</p>
+            <p><strong>Dominant Weather:</strong> {{ daily_summary.dominant_weather }}</p>
+        </div>
+    </div>
+
+    <!-- Display alerts -->
+    <h3 class="text-center">Alerts</h3>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            {% if alerts %}
+                <ul class="list-group list-group-flush">
+                    {% for alert in alerts %}
+                        <li class="list-group-item">{{ alert }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-center text-muted">No alerts triggered.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
-
-<h3>Daily Summary</h3>
-<p>Average Temperature: <span id="avg-temp" data-avg-c="{{ daily_summary.avg_temp }}">{{ daily_summary.avg_temp|floatformat:2 }}</span></p>
-<p>Max Temperature: <span id="max-temp" data-max-c="{{ daily_summary.max_temp }}">{{ daily_summary.max_temp|floatformat:2 }}</span></p>
-<p>Min Temperature: <span id="min-temp" data-min-c="{{ daily_summary.min_temp }}">{{ daily_summary.min_temp|floatformat:2 }}</span></p>
-<p>Average Humidity: {{ daily_summary.avg_humidity|floatformat:2 }}%</p>
-<p>Max Wind Speed: {{ daily_summary.max_wind_speed|floatformat:2 }} m/s</p>
-<p>Dominant Weather: {{ daily_summary.dominant_weather }}</p>
-
-<h3>Alerts</h3>
-{% if alerts %}
-    <ul>
-        {% for alert in alerts %}
-            <li>{{ alert }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No alerts triggered.</p>
-{% endif %}
 
 <!-- SSE to fetch latest weather data -->
 <script>
@@ -63,20 +97,24 @@ function updateWeatherData(data) {
 
     data.forEach(weather => {
         const weatherDiv = document.createElement("div");
-        weatherDiv.classList.add("city-weather");
-        weatherDiv.setAttribute("data-temp-c", weather.temperature);
-        weatherDiv.setAttribute("data-feels-like-c", weather.feels_like);
-        weatherDiv.setAttribute("data-humidity", weather.humidity);
-        weatherDiv.setAttribute("data-wind-speed", weather.wind_speed);
-
+        weatherDiv.classList.add("col-md-4", "mb-4");
+        
         weatherDiv.innerHTML = `
-            <h4>City: ${weather.city}</h4>
-            <p>Main Condition: ${weather.main}</p>
-            <p>Temperature: <span class="temp-value">${weather.temperature.toFixed(2)}</span></p>
-            <p>Feels Like: <span class="feels-like-value">${weather.feels_like.toFixed(2)}</span></p>
-            <p>Humidity: <span class="humidity-value">${weather.humidity}%</span></p>
-            <p>Wind Speed: <span class="wind-speed-value">${weather.wind_speed} m/s</span></p>
-            <p>Data Fetched At: ${convertUTCtoIST(weather.fetched_at)}</p>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">City: ${weather.city}</h5>
+                    <p><strong>Main Condition:</strong> ${weather.main}</p>
+                    <p><strong>Temperature:</strong> 
+                        <span class="temp-value" data-temp-c="${weather.temperature.toFixed(2)}">${weather.temperature.toFixed(2)} °C</span>
+                    </p>
+                    <p><strong>Feels Like:</strong> 
+                        <span class="feels-like-value" data-feels-like-c="${weather.feels_like.toFixed(2)}">${weather.feels_like.toFixed(2)} °C</span>
+                    </p>
+                    <p><strong>Humidity:</strong> <span class="humidity-value">${weather.humidity}%</span></p>
+                    <p><strong>Wind Speed:</strong> <span class="wind-speed-value">${weather.wind_speed} m/s</span></p>
+                    <p class="text-muted"><strong>Data Fetched At:</strong> ${convertUTCtoIST(weather.fetched_at)}</p>
+                </div>
+            </div>
         `;
         weatherDataDiv.appendChild(weatherDiv);
     });
@@ -87,25 +125,55 @@ function updateWeatherData(data) {
 
 function updateTemperature() {
     const tempUnit = document.getElementById("temp-unit").value;
-    const cityWeathers = document.querySelectorAll(".city-weather");
 
-    cityWeathers.forEach(weather => {
-        const tempC = parseFloat(weather.getAttribute("data-temp-c"));
-        const feelsLikeC = parseFloat(weather.getAttribute("data-feels-like-c"));
-        
-        let temp, feelsLike, unit;
+    // Select all elements that hold temperature data
+    const temperatures = document.querySelectorAll(".temp-value");
+    const feelsLikeTemps = document.querySelectorAll(".feels-like-value");
+    const summaryTemps = document.querySelectorAll(".summary-temp");  // New addition for summary section
+
+    temperatures.forEach((tempElement) => {
+        const tempC = parseFloat(tempElement.getAttribute("data-temp-c"));  // Get Celsius temperature from data attribute
+
+        let temp;
         if (tempUnit === "F") {
-            temp = (tempC * 9 / 5) + 32;
-            feelsLike = (feelsLikeC * 9 / 5) + 32;
-            unit = "°F";
+            temp = (tempC * 9 / 5) + 32;  // Convert to Fahrenheit
         } else {
-            temp = tempC;
-            feelsLike = feelsLikeC;
-            unit = "°C";
+            temp = tempC;  // Keep in Celsius
         }
 
-        weather.querySelector(".temp-value").textContent = temp.toFixed(2) + " " + unit;
-        weather.querySelector(".feels-like-value").textContent = feelsLike.toFixed(2) + " " + unit;
+        // Update the temperature text with the appropriate unit
+        tempElement.textContent = temp.toFixed(2) + " °" + tempUnit;
+    });
+
+    feelsLikeTemps.forEach((feelsLikeElement) => {
+        const feelsLikeC = parseFloat(feelsLikeElement.getAttribute("data-feels-like-c"));  // Get Celsius "feels like" temperature from data attribute
+
+        let feelsLike;
+        if (tempUnit === "F") {
+            feelsLike = (feelsLikeC * 9 / 5) + 32;  // Convert to Fahrenheit
+        } else {
+            feelsLike = feelsLikeC;  // Keep in Celsius
+        }
+
+        // Update the "feels like" temperature with the appropriate unit
+        feelsLikeElement.textContent = feelsLike.toFixed(2) + " °" + tempUnit;
+    });
+
+    // Update the summary section temperatures
+    summaryTemps.forEach((summaryElement) => {
+        const tempC = parseFloat(summaryElement.getAttribute(`data-avg-c`)) || 
+                      parseFloat(summaryElement.getAttribute(`data-max-c`)) ||
+                      parseFloat(summaryElement.getAttribute(`data-min-c`));
+
+        let temp;
+        if (tempUnit === "F") {
+            temp = (tempC * 9 / 5) + 32;  // Convert to Fahrenheit
+        } else {
+            temp = tempC;  // Keep in Celsius
+        }
+
+        // Update the summary temperature with the appropriate unit
+        summaryElement.textContent = temp.toFixed(2) + " °" + tempUnit;
     });
 }
 
@@ -117,5 +185,4 @@ function convertUTCtoIST(utcTime) {
     return istDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 }
 </script>
-
 {% endblock %}
