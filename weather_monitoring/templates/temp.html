@@ -10,14 +10,17 @@
     <option value="F">Fahrenheit (°F)</option>
 </select>
 
+<!-- Display weather data -->
 <div id="weather-data">
     {% if latest_data %}
         {% for data in latest_data %}
-            <div class="city-weather" data-temp-c="{{ data.temperature }}" data-feels-like-c="{{ data.feels_like }}">
+            <div class="city-weather" data-temp-c="{{ data.temperature }}" data-feels-like-c="{{ data.feels_like }}" data-humidity="{{ data.humidity }}" data-wind-speed="{{ data.wind_speed }}">
                 <h4>City: {{ data.city }}</h4>
                 <p>Main Condition: {{ data.main }}</p>
                 <p>Temperature: <span class="temp-value">{{ data.temperature|floatformat:2 }}</span></p>
                 <p>Feels Like: <span class="feels-like-value">{{ data.feels_like|floatformat:2 }}</span></p>
+                <p>Humidity: <span class="humidity-value">{{ data.humidity }}%</span></p>
+                <p>Wind Speed: <span class="wind-speed-value">{{ data.wind_speed }} m/s</span></p>
                 <p>Data Fetched At: {{ data.fetched_at }}</p>
             </div>
         {% endfor %}
@@ -30,6 +33,8 @@
 <p>Average Temperature: <span id="avg-temp" data-avg-c="{{ daily_summary.avg_temp }}">{{ daily_summary.avg_temp|floatformat:2 }}</span></p>
 <p>Max Temperature: <span id="max-temp" data-max-c="{{ daily_summary.max_temp }}">{{ daily_summary.max_temp|floatformat:2 }}</span></p>
 <p>Min Temperature: <span id="min-temp" data-min-c="{{ daily_summary.min_temp }}">{{ daily_summary.min_temp|floatformat:2 }}</span></p>
+<p>Average Humidity: {{ daily_summary.avg_humidity|floatformat:2 }}%</p>
+<p>Max Wind Speed: {{ daily_summary.max_wind_speed|floatformat:2 }} m/s</p>
 <p>Dominant Weather: {{ daily_summary.dominant_weather }}</p>
 
 <h3>Alerts</h3>
@@ -61,12 +66,16 @@ function updateWeatherData(data) {
         weatherDiv.classList.add("city-weather");
         weatherDiv.setAttribute("data-temp-c", weather.temperature);
         weatherDiv.setAttribute("data-feels-like-c", weather.feels_like);
+        weatherDiv.setAttribute("data-humidity", weather.humidity);
+        weatherDiv.setAttribute("data-wind-speed", weather.wind_speed);
 
         weatherDiv.innerHTML = `
             <h4>City: ${weather.city}</h4>
             <p>Main Condition: ${weather.main}</p>
             <p>Temperature: <span class="temp-value">${weather.temperature.toFixed(2)}</span></p>
             <p>Feels Like: <span class="feels-like-value">${weather.feels_like.toFixed(2)}</span></p>
+            <p>Humidity: <span class="humidity-value">${weather.humidity}%</span></p>
+            <p>Wind Speed: <span class="wind-speed-value">${weather.wind_speed} m/s</span></p>
             <p>Data Fetched At: ${convertUTCtoIST(weather.fetched_at)}</p>
         `;
         weatherDataDiv.appendChild(weatherDiv);

@@ -17,6 +17,8 @@ def fetch_weather_data():
             temperature = data['main']['temp'] - 273.15  # Convert from Kelvin to Celsius
             feels_like = data['main']['feels_like'] - 273.15
             main = data['weather'][0]['main']
+            humidity = data['main']['humidity']  # Extract humidity
+            wind_speed = data['wind']['speed']  # Extract wind speed
             dt = datetime.fromtimestamp(data['dt'])
             dt = timezone.make_aware(dt)  # Make datetime timezone-aware
 
@@ -26,6 +28,8 @@ def fetch_weather_data():
                 main=main,
                 temperature=temperature,
                 feels_like=feels_like,
+                humidity=humidity,  # Store humidity
+                wind_speed=wind_speed,  # Store wind speed
                 dt=dt  # Use the timezone-aware datetime
             )
         else:
@@ -34,11 +38,13 @@ def fetch_weather_data():
 def calculate_daily_aggregates():
     today = datetime.today().date()
     
-    # Aggregate temperature data
+    # Aggregate temperature data along with humidity and wind speed
     summary = WeatherData.objects.filter(dt__date=today).aggregate(
         avg_temp=Avg('temperature'),
         max_temp=Max('temperature'),
         min_temp=Min('temperature'),
+        avg_humidity=Avg('humidity'),  # Aggregate humidity
+        max_wind_speed=Max('wind_speed')  # Aggregate wind speed
     )
     
     # Get the dominant weather condition separately
