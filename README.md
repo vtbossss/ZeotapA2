@@ -61,7 +61,8 @@ The project uses the following major dependencies:
 
 3. Build and start the application using Docker Compose:
    ```bash
-   docker-compose up --build
+   docker-compose build
+   docker-compose up
    ```
 
    This will start the following services:
