@@ -51,13 +51,19 @@
     <div class="card my-4 shadow-sm">
         <div class="card-body">
             <p><strong>Average Temperature:</strong> 
-                <span id="avg-temp" class="summary-temp" data-avg-c="{{ daily_summary.avg_temp }}">{{ daily_summary.avg_temp|floatformat:2 }} °C</span>
+                <span id="avg-temp" class="summary-temp" data-avg-c="{{ daily_summary.avg_temp }}">
+                    {{ daily_summary.avg_temp|floatformat:2 }} °C
+                </span>
             </p>
             <p><strong>Max Temperature:</strong> 
-                <span id="max-temp" class="summary-temp" data-max-c="{{ daily_summary.max_temp }}">{{ daily_summary.max_temp|floatformat:2 }} °C</span>
+                <span id="max-temp" class="summary-temp" data-max-c="{{ daily_summary.max_temp }}">
+                    {{ daily_summary.max_temp|floatformat:2 }} °C
+                </span>
             </p>
             <p><strong>Min Temperature:</strong> 
-                <span id="min-temp" class="summary-temp" data-min-c="{{ daily_summary.min_temp }}">{{ daily_summary.min_temp|floatformat:2 }} °C</span>
+                <span id="min-temp" class="summary-temp" data-min-c="{{ daily_summary.min_temp }}">
+                    {{ daily_summary.min_temp|floatformat:2 }} °C
+                </span>
             </p>
             <p><strong>Average Humidity:</strong> {{ daily_summary.avg_humidity|floatformat:2 }}%</p>
             <p><strong>Max Wind Speed:</strong> {{ daily_summary.max_wind_speed|floatformat:2 }} m/s</p>
@@ -84,105 +90,109 @@
 
 <!-- SSE to fetch latest weather data -->
 <script>
-const evtSource = new EventSource("{% url 'weather:stream_weather' %}");
+    const evtSource = new EventSource("{% url 'weather:stream_weather' %}");
 
-evtSource.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    updateWeatherData(data);
-};
+    evtSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        updateWeatherData(data);
+    };
 
-function updateWeatherData(data) {
-    const weatherDataDiv = document.getElementById("weather-data");
-    weatherDataDiv.innerHTML = ""; // Clear existing data
+    function updateWeatherData(data) {
+        const weatherDataDiv = document.getElementById("weather-data");
+        weatherDataDiv.innerHTML = ""; // Clear existing data
 
-    data.forEach(weather => {
-        const weatherDiv = document.createElement("div");
-        weatherDiv.classList.add("col-md-4", "mb-4");
-        
-        weatherDiv.innerHTML = `
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">City: ${weather.city}</h5>
-                    <p><strong>Main Condition:</strong> ${weather.main}</p>
-                    <p><strong>Temperature:</strong> 
-                        <span class="temp-value" data-temp-c="${weather.temperature.toFixed(2)}">${weather.temperature.toFixed(2)} °C</span>
-                    </p>
-                    <p><strong>Feels Like:</strong> 
-                        <span class="feels-like-value" data-feels-like-c="${weather.feels_like.toFixed(2)}">${weather.feels_like.toFixed(2)} °C</span>
-                    </p>
-                    <p><strong>Humidity:</strong> <span class="humidity-value">${weather.humidity}%</span></p>
-                    <p><strong>Wind Speed:</strong> <span class="wind-speed-value">${weather.wind_speed} m/s</span></p>
-                    <p class="text-muted"><strong>Data Fetched At:</strong> ${convertUTCtoIST(weather.fetched_at)}</p>
+        data.forEach(weather => {
+            const weatherDiv = document.createElement("div");
+            weatherDiv.classList.add("col-md-4", "mb-4");
+            
+            weatherDiv.innerHTML = `
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">City: ${weather.city}</h5>
+                        <p><strong>Main Condition:</strong> ${weather.main}</p>
+                        <p><strong>Temperature:</strong> 
+                            <span class="temp-value" data-temp-c="${weather.temperature.toFixed(2)}">
+                                ${weather.temperature.toFixed(2)} °C
+                            </span>
+                        </p>
+                        <p><strong>Feels Like:</strong> 
+                            <span class="feels-like-value" data-feels-like-c="${weather.feels_like.toFixed(2)}">
+                                ${weather.feels_like.toFixed(2)} °C
+                            </span>
+                        </p>
+                        <p><strong>Humidity:</strong> <span class="humidity-value">${weather.humidity}%</span></p>
+                        <p><strong>Wind Speed:</strong> <span class="wind-speed-value">${weather.wind_speed} m/s</span></p>
+                        <p class="text-muted"><strong>Data Fetched At:</strong> ${convertUTCtoIST(weather.fetched_at)}</p>
+                    </div>
                 </div>
-            </div>
-        `;
-        weatherDataDiv.appendChild(weatherDiv);
-    });
+            `;
+            weatherDataDiv.appendChild(weatherDiv);
+        });
 
-    // Call updateTemperature to apply the current unit after updating weather data
-    updateTemperature();
-}
+        // Call updateTemperature to apply the current unit after updating weather data
+        updateTemperature();
+    }
 
-function updateTemperature() {
-    const tempUnit = document.getElementById("temp-unit").value;
+    function updateTemperature() {
+        const tempUnit = document.getElementById("temp-unit").value;
 
-    // Select all elements that hold temperature data
-    const temperatures = document.querySelectorAll(".temp-value");
-    const feelsLikeTemps = document.querySelectorAll(".feels-like-value");
-    const summaryTemps = document.querySelectorAll(".summary-temp");  // New addition for summary section
+        // Select all elements that hold temperature data
+        const temperatures = document.querySelectorAll(".temp-value");
+        const feelsLikeTemps = document.querySelectorAll(".feels-like-value");
+        const summaryTemps = document.querySelectorAll(".summary-temp");  // For summary section
 
-    temperatures.forEach((tempElement) => {
-        const tempC = parseFloat(tempElement.getAttribute("data-temp-c"));  // Get Celsius temperature from data attribute
+        temperatures.forEach((tempElement) => {
+            const tempC = parseFloat(tempElement.getAttribute("data-temp-c"));  // Get Celsius temperature
 
-        let temp;
-        if (tempUnit === "F") {
-            temp = (tempC * 9 / 5) + 32;  // Convert to Fahrenheit
-        } else {
-            temp = tempC;  // Keep in Celsius
-        }
+            let temp;
+            if (tempUnit === "F") {
+                temp = (tempC * 9 / 5) + 32;  // Convert to Fahrenheit
+            } else {
+                temp = tempC;  // Keep in Celsius
+            }
 
-        // Update the temperature text with the appropriate unit
-        tempElement.textContent = temp.toFixed(2) + " °" + tempUnit;
-    });
+            // Update the temperature text with the appropriate unit
+            tempElement.textContent = temp.toFixed(2) + " °" + tempUnit;
+        });
 
-    feelsLikeTemps.forEach((feelsLikeElement) => {
-        const feelsLikeC = parseFloat(feelsLikeElement.getAttribute("data-feels-like-c"));  // Get Celsius "feels like" temperature from data attribute
+        feelsLikeTemps.forEach((feelsLikeElement) => {
+            const feelsLikeC = parseFloat(feelsLikeElement.getAttribute("data-feels-like-c"));  // Get Celsius "feels like" temperature
 
-        let feelsLike;
-        if (tempUnit === "F") {
-            feelsLike = (feelsLikeC * 9 / 5) + 32;  // Convert to Fahrenheit
-        } else {
-            feelsLike = feelsLikeC;  // Keep in Celsius
-        }
+            let feelsLike;
+            if (tempUnit === "F") {
+                feelsLike = (feelsLikeC * 9 / 5) + 32;  // Convert to Fahrenheit
+            } else {
+                feelsLike = feelsLikeC;  // Keep in Celsius
+            }
 
-        // Update the "feels like" temperature with the appropriate unit
-        feelsLikeElement.textContent = feelsLike.toFixed(2) + " °" + tempUnit;
-    });
+            // Update the "feels like" temperature
+            feelsLikeElement.textContent = feelsLike.toFixed(2) + " °" + tempUnit;
+        });
 
-    // Update the summary section temperatures
-    summaryTemps.forEach((summaryElement) => {
-        const tempC = parseFloat(summaryElement.getAttribute(`data-avg-c`)) || 
-                      parseFloat(summaryElement.getAttribute(`data-max-c`)) ||
-                      parseFloat(summaryElement.getAttribute(`data-min-c`));
+        // Update the summary section temperatures
+        summaryTemps.forEach((summaryElement) => {
+            const tempC = parseFloat(summaryElement.getAttribute("data-avg-c")) || 
+                          parseFloat(summaryElement.getAttribute("data-max-c")) ||
+                          parseFloat(summaryElement.getAttribute("data-min-c"));
 
-        let temp;
-        if (tempUnit === "F") {
-            temp = (tempC * 9 / 5) + 32;  // Convert to Fahrenheit
-        } else {
-            temp = tempC;  // Keep in Celsius
-        }
+            let temp;
+            if (tempUnit === "F") {
+                temp = (tempC * 9 / 5) + 32;  // Convert to Fahrenheit
+            } else {
+                temp = tempC;  // Keep in Celsius
+            }
 
-        // Update the summary temperature with the appropriate unit
-        summaryElement.textContent = temp.toFixed(2) + " °" + tempUnit;
-    });
-}
+            // Update the summary temperature with the appropriate unit
+            summaryElement.textContent = temp.toFixed(2) + " °" + tempUnit;
+        });
+    }
 
-// Function to convert UTC to IST in JavaScript
-function convertUTCtoIST(utcTime) {
-    const utcDate = new Date(utcTime);
-    const offset = 5.5 * 60 * 60 * 1000;  // IST is UTC + 5:30
-    const istDate = new Date(utcDate.getTime() + offset);
-    return istDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
-}
+    // Function to convert UTC to IST in JavaScript
+    function convertUTCtoIST(utcTime) {
+        const utcDate = new Date(utcTime);
+        const offset = 5.5 * 60 * 60 * 1000;  // IST is UTC + 5:30
+        const istDate = new Date(utcDate.getTime() + offset);
+        return istDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+    }
 </script>
 {% endblock %}

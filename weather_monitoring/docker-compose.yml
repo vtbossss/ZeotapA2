@@ -1,55 +1,56 @@
+
 services:
-  django:
-    build: .
-    container_name: django_app
-    command: >
-      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+  django:  # Django application service
+    build: .  # Build the Docker image from the current directory
+    container_name: django_app  # Name the container for easy reference
+    command: >  # Command to run when the container starts
+      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"  # Run migrations and start the server
     volumes:
-      - .:/app
+      - .:/app  # Mount the current directory to /app in the container
     ports:
-      - "8000:8000"
+      - "8000:8000"  # Map port 8000 of the container to port 8000 on the host
     env_file:
-      - .env
+      - .env  # Load environment variables from the .env file
     depends_on:
-      - redis
+      - redis  # Ensure Redis service starts before Django
     networks:
-      - webnet
+      - webnet  # Connect to the specified network
 
-  redis:
-    image: "redis:alpine"
-    container_name: redis
+  redis:  # Redis service for message brokering
+    image: "redis:alpine"  # Use the Redis Alpine image
+    container_name: redis  # Name the container for easy reference
     ports:
-      - "6379:6379"
+      - "6379:6379"  # Map port 6379 of the container to port 6379 on the host
     networks:
-      - webnet
+      - webnet  # Connect to the specified network
 
-  celery:
-    build: .
-    container_name: celery_worker
-    command: celery -A weather_monitoring worker --loglevel=info
+  celery:  # Celery worker service
+    build: .  # Build the Docker image from the current directory
+    container_name: celery_worker  # Name the container for easy reference
+    command: celery -A weather_monitoring worker --loglevel=info  # Start the Celery worker
     volumes:
-      - .:/app
+      - .:/app  # Mount the current directory to /app in the container
     env_file:
-      - .env
+      - .env  # Load environment variables from the .env file
     depends_on:
-      - redis
-      - django
+      - redis  # Ensure Redis service starts before Celery
+      - django  # Ensure Django service starts before Celery
     networks:
-      - webnet
+      - webnet  # Connect to the specified network
 
-  celery-beat:
-    build: .
-    container_name: celery_beat
-    command: celery -A weather_monitoring beat --loglevel=info
+  celery-beat:  # Celery Beat service for scheduling tasks
+    build: .  # Build the Docker image from the current directory
+    container_name: celery_beat  # Name the container for easy reference
+    command: celery -A weather_monitoring beat --loglevel=info  # Start the Celery Beat scheduler
     volumes:
-      - .:/app
+      - .:/app  # Mount the current directory to /app in the container
     env_file:
-      - .env
+      - .env  # Load environment variables from the .env file
     depends_on:
-      - redis
-      - django
+      - redis  # Ensure Redis service starts before Celery Beat
+      - django  # Ensure Django service starts before Celery Beat
     networks:
-      - webnet
+      - webnet  # Connect to the specified network
 
 networks:
-  webnet:
+  webnet:  # Define the custom network

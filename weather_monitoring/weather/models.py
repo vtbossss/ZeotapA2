@@ -1,5 +1,7 @@
 from django.db import models
+from django.utils import timezone
 
+# Model for storing weather data
 class WeatherData(models.Model):
     city = models.CharField(max_length=100)
     main = models.CharField(max_length=50)
@@ -13,8 +15,8 @@ class WeatherData(models.Model):
     def __str__(self):
         return f"{self.city} - {self.temperature}°C"
 
-from django.utils import timezone
 
+# Model for storing daily aggregates
 class DailyAggregate(models.Model):
     # Field to store the date of the aggregate
     date = models.DateField(default=timezone.now, unique=True)
