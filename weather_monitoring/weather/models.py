@@ -20,11 +20,11 @@ class DailyAggregate(models.Model):
     date = models.DateField(default=timezone.now, unique=True)
 
     # Fields to store aggregated data
-    avg_temp = models.FloatField()
-    max_temp = models.FloatField()
-    min_temp = models.FloatField()
-    avg_humidity = models.FloatField()
-    max_wind_speed = models.FloatField()
+    avg_temp = models.FloatField(null=True, blank=True)
+    max_temp = models.FloatField(null=True, blank=True)
+    min_temp = models.FloatField(null=True, blank=True)
+    avg_humidity = models.FloatField(null=True, blank=True)
+    max_wind_speed = models.FloatField(null=True, blank=True)
 
     # Field to store the dominant weather condition
     dominant_weather = models.CharField(max_length=100, null=True, blank=True)
