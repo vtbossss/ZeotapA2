@@ -23,7 +23,7 @@
             background-color: #007bff;  /* Bright blue for the navbar */
             padding: 1rem;
             position: relative;  /* Ensure navbar sits above other content */
-            z-index: 1;  /* Ensure navbar appears above header and other elements */
+              /* Ensure navbar appears above header and other elements */
         }
 
         .navbar-brand {
@@ -39,6 +39,7 @@
             font-weight: 600;  /* Increase font weight to match the bold title */
             font-size: 1.2rem;  /* Slightly larger font for visibility */
             transition: color 0.3s ease;
+            z-index: 50;
         }
 
         /* Enhanced hover effect */
@@ -46,20 +47,10 @@
             color: #ffdd57;  /* Yellow tint on hover */
         }
         
-        /* Header styling */
-        header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-            margin-top: -2rem; /* Move the header up slightly to reduce gap */
-            z-index: 0; /* Make sure the header doesn't cover the navbar */
-        }
+        
+        
 
-        header h1 {
-            font-size: 2.5rem;
-            font-weight: 600;
-        }
+        
 
         /* Main content styling */
         main {
@@ -101,9 +92,9 @@
     </nav>
 
     <!-- Header Section -->
-    <header>
+    {% comment %} <header>
         <h1>Weather Monitoring System</h1>
-    </header>
+    </header> {% endcomment %}
 
     <!-- Main Content -->
     <main>
