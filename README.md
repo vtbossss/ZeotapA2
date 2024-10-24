@@ -69,11 +69,6 @@ The project uses the following major dependencies:
    - **Redis** service running on `localhost:6379`.
    - **Celery** worker and beat to handle periodic tasks.
 
-4. Run database migrations:
-   ```bash
-   docker-compose exec django python manage.py migrate
-   ```
-
 5. Access the application in your browser at `http://localhost:8000`.
 
 ### Usage
