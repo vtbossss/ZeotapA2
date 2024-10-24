@@ -68,6 +68,7 @@ def calculate_daily_aggregates():
             'dominant_weather': summary['dominant_weather']
         }
     )
+    return summary
 
 # Hard-coded threshold values
 TEMP_THRESHOLD = 35  # degrees Celsius
