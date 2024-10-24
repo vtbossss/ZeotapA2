@@ -4,9 +4,9 @@ FROM python:3.9
 # Set the working directory
 WORKDIR /app
 
-# Install necessary packages
+# Install necessary packages (netcat-openbsd and gcc, no need for libpq-dev)
 RUN apt-get update && \
-    apt-get install -y netcat-openbsd gcc libpq-dev && \
+    apt-get install -y netcat-openbsd gcc && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
