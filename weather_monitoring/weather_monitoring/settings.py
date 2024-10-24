@@ -127,8 +127,8 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Celery configuration
-#CELERY_BROKER_URL = 'redis://redis:6379/0'  # URL for the Celery broker (Redis)
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Uncomment for local Redis setup
+CELERY_BROKER_URL = 'redis://redis:6379/0'  # URL for the Celery broker (Redis)
+#CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Uncomment for local Redis setup
 
 CELERY_ACCEPT_CONTENT = ['json']  # Specify accepted content types
 CELERY_TASK_SERIALIZER = 'json'  # Specify task serialization format
