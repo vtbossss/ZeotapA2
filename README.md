@@ -125,5 +125,11 @@ The app uses **Plotly** to display weather trends, such as daily average tempera
 - Implement user-defined weather alerts based on thresholds (e.g., temperature spikes).
 - Integrate additional APIs for air quality monitoring or severe weather alerts.
 
+### Screenshots
+<img width="1680" alt="Screenshot 2024-10-26 at 03 28 44" src="https://github.com/user-attachments/assets/46320083-05a0-44cb-960a-0bce9e15dfe8"><br><br>
+
+
+<img width="1680" alt="Screenshot 2024-10-26 at 03 28 51" src="https://github.com/user-attachments/assets/83c3b5f3-c764-4d60-8c53-79ab69ddc13b">
+
 
 
