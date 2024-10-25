@@ -99,7 +99,7 @@ The project uses the following major dependencies:
 - The **Visualizations Page** provides graphical representations of weather data trends, allowing users to analyze patterns visually.
 - Background tasks for generating daily summaries run at **11:59 PM** (configurable in Celery), ensuring the latest data is processed and stored in Sqlite database present in project directory(db.sqlite3).
 - **Dominant Weather Condition**: This is determined by analyzing the weather conditions recorded for the day. The application counts the occurrences of each weather condition (from the `main` field) and identifies the condition with the highest count. 
--- **check for alerts(current_temp, weather_condition, city_name)**:
+- **check for alerts(current_temp, weather_condition, city_name)**:
   - Checks if the current temperature exceeds a predefined threshold (35°C) or if the weather condition is among those that trigger alerts (e.g., Rain, Thunderstorm).
   - Generates alerts based on these conditions.
 
