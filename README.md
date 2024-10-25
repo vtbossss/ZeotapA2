@@ -5,37 +5,55 @@ This project is a **Real-Time Weather Monitoring System** that fetches weather d
 
 ## Features
 - Fetch weather data at regular intervals from the OpenWeatherMap API.
+- Calculate dominant weather.
 - Store weather data for further analysis.
 - Calculate and store daily summaries (e.g., average, max, min temperature, humidity, wind speed).
 - Visualize weather trends using Plotly.
 - Background tasks using Celery and Redis for data processing and aggregation.
+- Alerts based on weather condition or thershold values.
 
 ## Project Structure
 ```bash
-weather_monitoring/
-├── weather_monitoring/
-│   ├── settings.py
-│   ├── urls.py
-│   ├── celery.py
-│   └── asgi.py
-├── weather/
-│   ├── models.py
-│   ├── views.py
-│   ├── tasks.py
-│   ├── utils.py
-│   └── templates/
-│       ├── home.html
-│       └── summaries.html
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
+ZeotapA2/
+└── weather_monitoring/
+    ├── Dockerfile               # Docker configuration file
+    ├── docker-compose.yml       # Docker Compose configuration file
+    ├── .env                     # Environment variables
+    ├── manage.py                # Django management script
+    ├── requirements.txt         # Project dependencies
+    ├── db.sqlite3               # SQLite database file
+    ├── celerybeat-schedule      # Celery Beat schedule file
+    ├── templates/               # HTML templates
+    │   ├── base.html
+    │   ├── home.html
+    │   ├── temp.html
+    │   └── visualizations.html
+    ├── weather/                 # Django app
+    │   ├── admin.py             # Admin interface configuration
+    │   ├── alerts.py            # Alerts logic
+    │   ├── apps.py              # App configuration
+    │   ├── models.py            # Database models
+    │   ├── tasks.py             # Celery tasks
+    │   ├── tests.py             # Tests for the app
+    │   ├── urls.py              # URL routing for the app
+    │   ├── utils.py             # Utility functions
+    │   ├── views.py             # Views for handling requests
+    │   └── visualizations.py     # Visualization logic
+    └── weather_monitoring/      # Main project directory
+        ├── asgi.py              # ASGI configuration
+        ├── celery.py            # Celery configuration
+        ├── settings.py          # Django settings
+        ├── urls.py              # URL routing for the project
+        └── wsgi.py              # WSGI configuration
+
 ```
 
-## Setup Instructions
+## Build Instructions
 
 ### Prerequisites
 - Docker and Docker Compose
 - OpenWeatherMap API key
+- Secret key(django)
 
 ### Dependencies
 The project uses the following major dependencies:
@@ -74,13 +92,19 @@ The project uses the following major dependencies:
 
 ### Usage
 
-- The home page displays real-time weather data fetched from the OpenWeatherMap API along with daily summaries.
-- The Visualizations Page in this project provides graphical representations of weather data trends.
-- Background tasks for daily summaries run at 11:59 PM (configurable in Celery).
+- The **Home Page** displays real-time weather data fetched from the OpenWeatherMap API, with updates occurring every minute along with daily summaries.
+- The **Visualizations Page** provides graphical representations of weather data trends, allowing users to analyze patterns visually.
+- Background tasks for generating daily summaries run at **11:59 PM** (configurable in Celery), ensuring the latest data is processed and stored in Sqlite database present in project directory(db.sqlite3).
+- **Dominant Weather Condition**: This is determined by analyzing the weather conditions recorded for the day. The application counts the occurrences of each weather condition (from the `main` field) and identifies the condition with the highest count. 
+-- **check for alerts(current_temp, weather_condition, city_name)**:
+  - Checks if the current temperature exceeds a predefined threshold (35°C) or if the weather condition is among those that trigger alerts (e.g., Rain, Thunderstorm).
+  - Generates alerts based on these conditions.
+
+
 
 ### Visualizations
 
-The app uses **Plotly** to display weather trends, such as temperature changes and humidity levels. You can access the visualizations at `/visualizations/`.
+The app uses **Plotly** to display weather trends, such as daily average temperature. You can access the visualizations at `/visualizations/`.
 
 ### Design Choices
 
@@ -88,6 +112,8 @@ The app uses **Plotly** to display weather trends, such as temperature changes a
 - **Celery** with **Redis** is used for task queuing and periodic tasks.
 - **Docker** containers ensure consistency across environments and simplify deployment.
 - **SQLite** is used for local development; you can replace it with PostgreSQL or any other RDBMS in production.
+- **Redis** is used as message broker for celery.
+- **SSE(server side events)** is used for updating weather data on frontend without reloading the page.
 
 ### How to Extend
 
@@ -95,9 +121,5 @@ The app uses **Plotly** to display weather trends, such as temperature changes a
 - Implement user-defined weather alerts based on thresholds (e.g., temperature spikes).
 - Integrate additional APIs for air quality monitoring or severe weather alerts.
 
-### Deployment
 
-You can deploy the application using Docker to any cloud service provider that supports Docker containers. Ensure that you configure environment variables for the production environment.
 
-### License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
