@@ -67,7 +67,9 @@ The project uses the following major dependencies:
 1. Clone the repository:
    ```bash
    git clone https://github.com/vtbossss/ZeotapA2
+   
    cd ZeotapA2
+   
    cd weather_monitoring
    ```
 
@@ -77,9 +79,10 @@ The project uses the following major dependencies:
    OPENWEATHER_API_KEY=your_openweathermap_api_key
    ```
 
-3. Build and start the application using Docker Compose:
+3. Build and start the application using Docker Compose(make sure u are in project directory where docker-compose.yml is available):
    ```bash
    docker-compose build
+   
    docker-compose up
    ```
 
