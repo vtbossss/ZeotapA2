@@ -52,6 +52,7 @@ ZeotapA2/
 
 ### Prerequisites
 - Docker and Docker Compose
+- Git
 - OpenWeatherMap API key
 - Secret key(django)
 
